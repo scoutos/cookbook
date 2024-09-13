@@ -8,8 +8,12 @@ All your workflow needs to get executed is an LLM block ready to consume user pr
 
 ## Getting Started
 
-First, run the development server:
+Install Dependencies:
+```bash
+npm run install
+```
 
+First, run the development server:
 ```bash
 npm run dev
 # or
