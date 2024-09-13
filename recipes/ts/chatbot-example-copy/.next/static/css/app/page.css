@@ -1,0 +1,65 @@
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[7].use[3]!./src/app/page.module.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
+.page_page__ZU32B {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-items: center;
+  min-height: 100svh;
+  font-family: var(--font-geist-sans);
+
+  max-width: 600px;
+  margin: 40px auto;
+  border-radius: 8px;
+  color: rgb(100, 100, 100);
+  background-color: #fff;
+}
+
+.page_header__kVzhN {
+  font-weight: 300;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.page_belly__MiUAk {
+  width: 100%;
+  border-top: 1px solid #ececec;
+  padding: 26px;
+}
+
+.page_convoChunk__CLkmb {
+  margin-bottom: 10px;
+}
+
+.page_footer__sHKi3 {
+  vertical-align: bottom;
+  margin-top: auto;
+  width: 100%;
+  padding: 26px;
+  border-top: 1px solid #ececec;
+}
+
+.page_prompt__eM97v {
+  width:100%;
+  min-height: 20px;
+  resize: none;
+  border: 1px solid #efefef;
+}
+
+.page_button__vnlhW {
+  width: 100%;
+  height: 40px;
+  cursor: pointer;
+  border: none;
+  background-color: #ececec;
+  &:hover {
+    background-color: #efefef;
+  }
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
