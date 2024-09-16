@@ -25,10 +25,14 @@
   width: 100%;
   border-top: 1px solid #ececec;
   padding: 26px;
+  max-height: 600px;
+  overflow-y: auto;
 }
 
 .convoChunk {
   margin-bottom: 10px;
+  padding: 24px;
+  border-radius: 12px;
 }
 
 .footer {
@@ -44,6 +48,17 @@
   min-height: 20px;
   resize: none;
   border: 1px solid #efefef;
+  padding: 10px;
+}
+
+.user {
+  text-align: right;
+  background-color:rgb(100, 100, 100);
+  color: #fff;
+}
+
+.bot {
+  background-color: #f5f5f5;
 }
 
 .button {
@@ -58,3 +73,4 @@
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
 }
+
