@@ -4,7 +4,7 @@
 
   align-items: center;
   justify-items: center;
-  min-height: 100svh;
+  height: 90svh;
   font-family: var(--font-geist-sans);
 
   max-width: 600px;

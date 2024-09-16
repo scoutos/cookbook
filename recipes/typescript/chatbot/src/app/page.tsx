@@ -60,7 +60,8 @@ export default function Home() {
     const botMessage = botMessages[timestamp]
     return {
       message: userMessage || botMessage,
-      user: userMessage ? 'user' : 'bot'
+      user: userMessage ? 'user' : 'bot',
+      key: timestamp
     }
   })
 
@@ -75,8 +76,10 @@ export default function Home() {
       // Passing the whole conversation can be taxing, so we will just remember the last few messages
       const lastFewMessages = orderedByTimestamps.map(({message}) => message).slice(-5) as string[]
       // @ts-ignore
-      const stream = await scout.current.workflows.executeStream(WORKFLOW_ID, {
+      const stream = await scout.current.workflows.runStream(WORKFLOW_ID, {
         input: { prompt: userPrompt, chat_history: lastFewMessages.toString() },
+        streaming: true,
+        environment: 'production' // Most recently published
       });
       const timestamp = String(new Date().getTime() + 1)
       for await (const chunk of stream) {
@@ -91,8 +94,12 @@ export default function Home() {
         <h3 className={styles.header}>Chatbot</h3>
       </div>
       <div className={styles.belly}>
-        {orderedByTimestamps.map(({user, message}) =>
-          <ReactMarkdown skipHtml={false} className={`${styles.convoChunk} ${user === 'bot' ? styles.bot : styles.user}`}>
+        {orderedByTimestamps.map(({user, message, key}) =>
+          <ReactMarkdown
+            skipHtml={false}
+            className={`${styles.convoChunk} ${user === 'bot' ? styles.bot : styles.user}`}
+            key={key}
+          >
             {message}
           </ReactMarkdown>
         )}
