@@ -9,10 +9,20 @@ All your workflow needs, is an LLM block ready to consume user prompts.
 
 #### Getting your Workflow ready
 
-In order to create a chatbot with scout, youll need a workflow that utilizes an LLM block. 
+In order to create a chatbot with scout, youll need a workflow that utilizes the Input & LLM block.
+This app will pass two data points to the workflow, `prompt` and `chat_history`. These are managed on the Input block.
+**The Input Block**
+1. You'll need an input to handle user  `prompt` input of type `short_text`. 
+2. You'll want a `chat_history` input of type `long_text`.
+<img src="./screenshots/inputBlock.png" alt="drawing" style="width:800px;"/>
+
+
+**The LLM Block**
 1. At the very least, your LLM block should have a `user` (role) prompt to consume user input. (This example app uses `{{inputs.prompt}}`)
-2. In order for your chatbot to "remember" chat history, your LLM will need a prompt with an `assistant` role. This example app uses `{{inputs.chat_history}}`.
-3. Give your chat agent a specialty by setting a `system` prompt on your Workflows `LLM` block.
+3. In order for your chatbot to "remember" chat history, your LLM will need a prompt with an `assistant` role. This example app uses `{{inputs.chat_history}}`.
+4. Give your chat agent a specialty by setting a `system` prompt on your Workflows `LLM` block.
+<img src="./screenshots/llmBlock.png" alt="drawing" style="width:800px;"/>
+
 
 ## Starting this app
 
