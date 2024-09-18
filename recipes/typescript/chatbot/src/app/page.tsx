@@ -48,7 +48,7 @@ export default function Home() {
       // @ts-ignore
       setBotMessages(updatedChatHistory)
     } else if (
-      blockEvent === 'app_run_completed' || blockEvent === 'app_run_failed' // TODO: update to `workflow_run_...`
+      blockEvent === 'workflow_run_completed' || blockEvent === 'workflow_run_failed'
     ) {
       // @ts-ignore
       streamedResponse.current = ''
