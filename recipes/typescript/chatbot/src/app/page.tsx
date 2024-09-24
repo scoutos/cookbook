@@ -1,124 +1,144 @@
-'use client';
-import { SyntheticEvent, useEffect, useRef, useState } from "react"
-import ReactMarkdown from 'react-markdown'
-import styles from "./page.module.css"
-import { ScoutClient } from "scoutos"
+"use client";
 
-
-const LLM_BLOCK_ID = null // TODO: update to the block id of the LLM block
-const WORKFLOW_ID = null // TODO: update to the workflow id
-const SCOUT_API_KEY = null // TODO: update to the scout api key (find in the scout dashboard https://www.scoutos.com/dashboard/settings > `API Keys`)
-
-
-interface Message {
-  [key: string]: string
-}
-
-
+import { useSubmitMessage } from "./effects/use-submit-message";
+import MessageComponent from "./components/Message";
+import { MessageType } from "./models";
+import Image from "next/image";
 export default function Home() {
-
-  const scout = useRef<ScoutClient | null>(null);
-  const streamedResponse = useRef();
-  const [promptInput, setPromptInput] = useState('')
-  const [userMessages, setUserMessages] = useState<Message>({})
-  const [botMessages, setBotMessages] = useState<Message>({})
-
-  useEffect(() => {
-    if (!WORKFLOW_ID) throw new Error('WORKFLOW_ID is required')
-    if (!LLM_BLOCK_ID) throw new Error('LLM_BLOCK_ID is required')
-    if (!SCOUT_API_KEY) throw new Error('SCOUT_API_KEY is required')
-    const client = new ScoutClient({ apiKey: SCOUT_API_KEY });
-    scout.current = client;
-  }, [])
-
-  const parseStreamEvent = (chunk: any, key: string) => {
-    const blockEvent = chunk.name
-    const blockId = chunk?.data?.block_id
-    const updateType = chunk?.data?.update_type
-    if (
-      blockId === LLM_BLOCK_ID && 
-      blockEvent === 'block_state_updated' && 
-      updateType === 'partial'
-    ) {
-      const output = chunk?.data?.update_data?.output as string
-      const existingCurrentResponse = streamedResponse.current || ''
-      // @ts-ignore
-      streamedResponse.current = existingCurrentResponse + output
-      const updatedChatHistory = { ...botMessages, [key]: streamedResponse.current }
-      // @ts-ignore
-      setBotMessages(updatedChatHistory)
-    } else if (
-      blockEvent === 'workflow_run_completed' || blockEvent === 'workflow_run_failed'
-    ) {
-      // @ts-ignore
-      streamedResponse.current = ''
-    }
-  }
-
-  const orderedByTimestamps = Object.keys({...userMessages, ...botMessages}).sort().map((timestamp: string) => {
-    const userMessage = userMessages[timestamp]
-    const botMessage = botMessages[timestamp]
-    return {
-      message: userMessage || botMessage,
-      user: userMessage ? 'user' : 'bot',
-      key: timestamp
-    }
-  })
-
-  const handleButtonClick = async (e: SyntheticEvent) => {
-    setPromptInput('')
-    e.preventDefault()
-    // @ts-ignore
-    const userPrompt = e.target[0]?.value
-    const userMessageTimestamp = String(new Date().getTime())
-    setUserMessages({ ...userMessages, [userMessageTimestamp]: userPrompt })
-    if (scout?.current) {
-      // Passing the whole conversation can be taxing, so we will just remember the last few messages
-      const lastFewMessages = orderedByTimestamps.map(({message}) => message).slice(-5) as string[]
-      // @ts-ignore
-      const stream = await scout.current.workflows.runStream(WORKFLOW_ID, {
-        input: { prompt: userPrompt, chat_history: lastFewMessages.toString() },
-        streaming: true,
-        environment: 'production' // Most recently published
-      });
-      const timestamp = String(new Date().getTime() + 1)
-      for await (const chunk of stream) {
-        parseStreamEvent(chunk, timestamp)
-      }
-    }
-  }
+  const { promptInput, setUserMessage, handleSubmitMessage, aiState } =
+    useSubmitMessage();
 
   return (
-    <div className={styles.page}>
-      <div>
-        <h3 className={styles.header}>Chatbot</h3>
-      </div>
-      <div className={styles.belly}>
-        {orderedByTimestamps.map(({user, message, key}) =>
-          <ReactMarkdown
-            skipHtml={false}
-            className={`${styles.convoChunk} ${user === 'bot' ? styles.bot : styles.user}`}
-            key={key}
+    <div
+      className="grid grid-cols-12 items-center justify-center h-screen py-2 pr-2"
+      style={{ fontFamily: "var(--font-geist-sans)" }}
+    >
+      <aside className="col-span-3 h-full bg-white mt-4">
+        <span
+          className="text-black text-base font-medium leading-6 ml-6"
+          style={{
+            // fontFamily: "Switzer Variable",
+            fontStyle: "normal",
+          }}
+        >
+          Inbox
+        </span>
+        <div className="session-items flex justify-center items-center w-full mt-[20px]">
+          <div
+            className="flex flex-col session-container bg-[--grey] justify-center items-center w-11/12"
+            style={{
+              borderRadius: "var(--Spacing-8, 8px)",
+              border: "1px solid rgba(0, 0, 0, 0.10)",
+            }}
           >
-            {message}
-          </ReactMarkdown>
-        )}
-      </div>
-      <div className={styles.footer}>
-        <form onSubmit={handleButtonClick}>
+            <div
+              className="session-item-header flex items-center self-stretch"
+              style={{
+                padding: "var(--Spacing-12, 12px)",
+                gap: "var(--Spacing-8, 8px)",
+                flex: "1 0 0",
+                borderBottom: "1px solid rgba(0, 0, 0, 0.10)",
+              }}
+            >
+              <div className="flex justify-between items-center w-full">
+                <div className="flex items-center justify-between">
+                  <Image
+                    alt="session-img"
+                    className="rounded-full mr-2"
+                    height={16}
+                    width={16}
+                    src="https://ghexww3n55fveb5i.public.blob.vercel-storage.com/T04TMGM7A8L-U04T4GQ5LKH-59b3294503ef-512-9F6XxRVWgBPWYEev74Pg9JHWOGg8jJ.png"
+                  />
+                  <span
+                    className="text-black text-xs font-medium leading-5"
+                    style={{
+                      // fontFamily: "Switzer Variable",
+                      fontStyle: "normal",
+                    }}
+                  >
+                    This is the ticket title
+                  </span>
+                </div>
+                <span
+                  className="text-[rgba(0,0,0,0.60)] text-xs font-normal leading-5"
+                  style={{
+                    // fontFamily: "Switzer Variable",
+                    fontStyle: "normal",
+                  }}
+                >
+                  12 hours ago
+                </span>
+              </div>
+            </div>
+            <div
+              className="flex flex-col justify-center items-start self-stretch"
+              style={{
+                padding: "var(--Spacing-12, 12px)",
+                gap: "var(--Spacing-8, 8px)",
+              }}
+            >
+              <span
+                className="text-black text-sm font-normal leading-5 overflow-hidden"
+                style={{
+                  // fontFamily: "Switzer Variable",
+                  fontStyle: "normal",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                How do I get started?
+              </span>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <div
+        className="col-span-9 h-full w-full flex flex-col session-container bg-[--grey] justify-center items-center"
+        style={{
+          borderRadius: "var(--Spacing-8, 8px)",
+          border: "1px solid rgba(0, 0, 0, 0.10)",
+        }}
+      >
+        <div
+          className="container-header border-b w-full p-3"
+          style={{
+            color: "#000",
+            // fontFamily: "Switzer Variable",
+            fontSize: "16px",
+            fontStyle: "normal",
+            fontWeight: 500,
+            lineHeight: "20px",
+            padding: "14px 24px",
+            borderColor: "rgba(0, 0, 0, 0.10)",
+          }}
+        >
+          Chat
+        </div>
+        <div className="flex-grow flex flex-col justify-end gap-4 w-11/12">
+          {aiState.messages.map((message: MessageType) => (
+            <MessageComponent key={message.id} message={message} />
+          ))}
+        </div>
+        <form onSubmit={handleSubmitMessage} className="mt-4 flex w-11/12 mb-4">
           <textarea
-            rows={6}
-            title="prompt"
-            name="prompt"
-            className={styles.prompt}
+            className="w-full p-2"
             value={promptInput}
-            onChange={e => setPromptInput(e.target.value)}
+            onChange={(e) => setUserMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmitMessage(e);
+              }
+            }}
+            style={{
+              borderRadius: "var(--Spacing-8, 8px)",
+              border: "1px solid rgba(24, 24, 27, 0.10)",
+              background: "var(--Greyscale-Grayscale-0, #FFF)",
+              boxShadow:
+                "0px 1px 1px 0px rgba(0, 0, 0, 0.02), 0px -1.5px 1px 0px rgba(0, 0, 0, 0.08) inset",
+            }}
           />
-          <br />
-          <input type="submit" name="Chat" className={styles.button} />
         </form>
       </div>
     </div>
   );
 }
-
