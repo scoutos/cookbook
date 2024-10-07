@@ -110,8 +110,16 @@ Follow the instructions [here](https://discordpy.readthedocs.io/en/stable/discor
 
 ### Running the Project
 
-Run the project locally using Make:
+Run the bot locally using Make:
 
 ```sh
 make run dev
+```
+
+### Deploying the Project
+
+You can deploy the bot using Make:
+
+```sh
+make deploy
 ```
